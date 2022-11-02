@@ -1,0 +1,21 @@
+---
+- hosts: aci
+  gather_facts: False
+  connection: local
+  tasks:
+  - name: Create a Port Channel (PC) Interface Policy Group
+    cisco.aci.aci_interface_policy_leaf_policy_group:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      lag_type: node
+      policy_group: '{{ item }}'
+      description: vPC_LAB_Creation
+      link_level_policy: 10G_Auto
+      cdp_policy: CDP_Enabled
+      lldp_policy: LLDP_Enabled
+      port_channel_policy: LACP_Enabled
+      state: absent
+      aep: AAEP-1
+    with_sequence: start=1 end=5 format=Server%02d

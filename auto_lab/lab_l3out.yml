@@ -87,7 +87,7 @@
       interface_profile: '{{ var_l3out_interface_profile }}'
       pod_id: '{{ var_l3out_pod_id }}'
       node_id: '{{ var_l3out_node_id }}'
-      path_ep: "eth1/12"
+      path_ep: '{{ var_l3out_path_ep }}'
       interface_type: l3-port
       address: '{{ var_l3out_ipaddress }}'
       state: present

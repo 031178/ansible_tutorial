@@ -1,0 +1,10 @@
+all:
+  children:
+    aci:
+      hosts:
+        sandboxapicdc.cisco.com:
+          apic: 131.226.217.153
+      vars:
+        apic_user: 'admin'
+        apic_password: '!v3G@!4@Y'
+   

@@ -1,0 +1,71 @@
+---
+- hosts: aci
+  gather_facts: False
+  connection: local
+  vars_prompt:
+    - name: var_tenant #variable
+      private: no
+      prompt: "Enter Tenant Name"
+    - name: var_vrf #variable
+      private: no
+      prompt: "Enter VRF"
+    - name: var_bd #variable
+      private: no
+      prompt: "Enter BD number"
+    - name: var_pool #variable
+      private: no
+      prompt: "Enter VLAN Pool"
+
+  tasks:
+  - name: Create new Tenant
+    cisco.aci.aci_tenant:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      description: 
+      state: present
+  - name: Create new VRFs1
+    cisco.aci.aci_vrf:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      vrf: '{{ var_vrf }}'
+      tenant: '{{ var_tenant }}'
+      descr: Lab VRF
+      policy_control_preference: enforced
+      policy_control_direction: ingress
+      state: present
+  - name: Create new VRFs2
+    cisco.aci.aci_vrf:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      vrf: '{{ var_vrf }}'
+      tenant: '{{ var_tenant }}'
+      descr: Lab VRF
+      policy_control_preference: enforced
+      policy_control_direction: ingress
+      state: present
+  - name: Create BDs
+    cisco.aci.aci_bd:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      bd: '{{ var_bd }}'
+      vrf: '{{ var_vrf }}'
+      state: present
+  - name: Create new VLAN-POOL
+    cisco.aci.aci_vlan_pool:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      pool: '{{ var_pool }}'
+      pool_allocation_mode: static
+      state: present

@@ -1,0 +1,96 @@
+- hosts: aci
+  gather_facts: False
+  connection: local
+  vars_prompt:
+    - name: var_tenant #variable
+      private: no
+      prompt: "Enter Tenant name"
+    - name: var_vrf1 #variable
+      private: no
+      prompt: "Enter VRF1 name"
+    - name: var_l3out_name #variable
+      private: no
+      prompt: "Enter l3out name"
+    - name: var_l3out_domain #variable
+      private: no
+      prompt: "Enter l3out domain"
+    - name: var_l3out_vrf #variable
+      private: no
+      prompt: "Enter l3out vrf"
+    - name: var_l3out_protocol #variable
+      private: no
+      prompt: "Enter l3out protocol"
+  tasks:
+  - name: Create new Tenant
+    cisco.aci.aci_tenant:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      description: 
+      state: present
+  - name: Create new VRFs1
+    cisco.aci.aci_vrf:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      vrf: '{{ var_vrf1 }}'
+      tenant: '{{ var_tenant }}'
+      descr: Lab VRF
+      policy_control_preference: enforced
+      policy_control_direction: ingress
+      state: present      
+  - name: Add a new L3Out
+    cisco.aci.aci_l3out:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      name: '{{ var_l3out_name }}'
+      description: L3Out for Production tenant
+      domain: '{{ var_l3out_domain }}'
+      vrf: '{{ var_l3out_vrf }}'
+      l3protocol: '{{ var_l3out_protocol }}'
+      route_control: export
+      state: present
+  - name: Add a new routed interface 1
+    cisco.aci.aci_l3out_interface:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      tenant: '{{ var_tenant }}'
+      validate_certs: no
+      l3out: my_l3out
+      node_profile: my_node_profile
+      interface_profile: my_interface_profile
+      pod_id: 1
+      node_id: 201
+      path_ep: eth1/12
+      interface_type: l3-port
+      address: 192.168.10.1/27
+      state: present
+  - name: Add a new BGP peer on a physical interface
+    cisco.aci.aci_l3out_bgp_peer:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      tenant: '{{ var_tenant }}'
+      validate_certs: no
+      l3out: '{{ var_l3out_name }}'
+      node_profile: my_node_profile
+      interface_profile: my_interface_profile
+      pod_id: 1
+      node_id: 201
+      path_ep: eth1/12
+      peer_ip: 192.168.10.2
+      remote_asn: 65456
+      bgp_controls:
+        - nh-self
+        - send-com
+        - send-ext-com
+      peer_controls:
+        - bfd
+      state: present

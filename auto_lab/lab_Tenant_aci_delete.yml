@@ -1,0 +1,14 @@
+---
+- hosts: aci
+  gather_facts: False
+  connection: local
+  tasks:
+  - name: Delete Tenant
+    cisco.aci.aci_tenant:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: auto_lab_Tenant
+      description: 
+      state: absent

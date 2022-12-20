@@ -1,0 +1,299 @@
+---
+- hosts: aci
+  gather_facts: False
+  connection: local
+  vars_prompt:
+    - name: var_tenant #variable
+      private: no
+      prompt: "Enter Tenant name"
+    - name: var_vrf1 #variable
+      private: no
+      prompt: "Enter VRF1 name"
+    - name: var_vrf2 #variable
+      private: no
+      prompt: "Enter VRF2 name"
+    - name: var_bd1_pro #variable
+      private: no
+      prompt: "Enter BD1 PRO number"
+    - name: var_bd2_pro #variable
+      private: no
+      prompt: "Enter BD2 PRO number"
+    - name: var_bd1_pre #variable
+      private: no
+      prompt: "Enter BD1 PRE number"
+    - name: var_bd2_pre #variable
+      private: no
+      prompt: "Enter BD2 PRE number"
+    - name: var_pool #variable
+      private: no
+      prompt: "Enter VLAN Pool name"
+    - name: var_domain #variable
+      private: no
+      prompt: "Enter Physical Domain"
+    - name: var_ap #variable
+      private: no
+      prompt: "Enter Application Profile name"
+    - name: var_epg1_PRO #variable
+      private: no
+      prompt: "Enter EPG1 PRO"
+    - name: var_epg2_PRO #variable
+      private: no
+      prompt: "Enter EPG2 PRO"  
+    - name: var_epg1_PRE #variable
+      private: no
+      prompt: "Enter EPG1 PRE"
+    - name: var_epg2_PRE #variable
+      private: no
+      prompt: "Enter EPG2 PRE" 
+    - name: var_encap_id_pro1 #variable
+      private: no
+      prompt: "vlan id" 
+
+  tasks:
+  - name: Create new Tenant
+    cisco.aci.aci_tenant:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      description: 
+      state: present
+  - name: Create new VRFs1
+    cisco.aci.aci_vrf:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      vrf: '{{ var_vrf1 }}'
+      tenant: '{{ var_tenant }}'
+      descr: Lab VRF
+      policy_control_preference: enforced
+      policy_control_direction: ingress
+      state: present
+  - name: Create new VRFs2
+    cisco.aci.aci_vrf:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      vrf: '{{ var_vrf2 }}'
+      tenant: '{{ var_tenant }}'
+      descr: Lab VRF
+      policy_control_preference: enforced
+      policy_control_direction: ingress
+      state: present
+  - name: Create BDs1 PRO
+    cisco.aci.aci_bd:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      bd: '{{ var_bd1_pro }}'
+      vrf: '{{ var_vrf1 }}'
+      state: present
+  - name: Create BDs2 PRO
+    cisco.aci.aci_bd:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      bd: '{{ var_bd2_pro }}'
+      vrf: '{{ var_vrf1 }}'
+      state: present
+  - name: Create BDs1 PRE
+    cisco.aci.aci_bd:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      bd: '{{ var_bd1_pre }}'
+      vrf: '{{ var_vrf2 }}'
+      state: present
+  - name: Create BDs2 PRE
+    cisco.aci.aci_bd:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      bd: '{{ var_bd2_pre }}'
+      vrf: '{{ var_vrf2 }}'
+      state: present
+  - name: Create new VLAN-POOL
+    cisco.aci.aci_vlan_pool:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      pool: '{{ var_pool }}'
+      pool_allocation_mode: static
+      state: present
+  - name: ADD new VLANs encapsulation Block
+    cisco.aci.aci_vlan_pool_encap_block:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      pool: '{{ var_pool }}'
+      pool_allocation_mode: static
+      block_start: '1000'
+      block_end: '1100'
+      state: present
+  - name: Create PHY DOMAIN
+    cisco.aci.aci_domain:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      domain: '{{ var_domain }}'
+      domain_type: phys
+      state: present
+  - name: Associate PHY-DOMAIN to VLAN POOL
+    cisco.aci.aci_domain_to_encap_pool:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      domain: '{{ var_domain }}'
+      domain_type: phys
+      pool: '{{ var_pool }}'
+      pool_type: vlan
+      pool_allocation_mode: static
+      state: present
+  - name: Create AP
+    cisco.aci.aci_ap:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      ap: '{{ var_ap }}'
+      description: INTRANET LAB AP
+      monitoring_policy: default
+      state: present
+  - name: Create EPGs1 PRO
+    cisco.aci.aci_epg:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      ap: '{{ var_ap }}'
+      epg: '{{ var_epg1_PRO }}'
+      description: Web Intranet EPG
+      bd: '{{ var_bd1_pro }}'
+      monitoring_policy: default
+      preferred_group: yes
+      state: present
+  - name: Create EPGs2 PRO
+    cisco.aci.aci_epg:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      ap: '{{ var_ap }}'
+      epg: '{{ var_epg2_PRO }}'
+      description: Web Intranet EPG
+      bd: '{{ var_bd2_pro }}'
+      monitoring_policy: default
+      preferred_group: yes
+      state: present
+  - name: Create EPGs1 PRE
+    cisco.aci.aci_epg:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      ap: '{{ var_ap }}'
+      epg: '{{ var_epg1_PRE }}'
+      description: Web Intranet EPG
+      bd: '{{ var_bd1_pre }}'
+      monitoring_policy: default
+      preferred_group: yes
+      state: present
+  - name: Create EPGs2 PRE
+    cisco.aci.aci_epg:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      ap: '{{ var_ap }}'
+      epg: '{{ var_epg2_PRE }}'
+      description: Web Intranet EPG
+      bd: '{{ var_bd2_pre }}'
+      monitoring_policy: default
+      preferred_group: yes
+      state: present
+  - name: Associated physical Domain to EPG
+    cisco.aci.aci_epg_to_domain:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      ap: '{{ var_ap }}'
+      epg: '{{ var_epg1_PRO }}'
+      domain: '{{ var_domain }}'
+      domain_type: phys
+      state: present
+  - name: Associated physical Domain to EPG
+    cisco.aci.aci_epg_to_domain:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      ap: '{{ var_ap }}'
+      epg: '{{ var_epg2_PRO }}'
+      domain: '{{ var_domain }}'
+      domain_type: phys
+      state: present    
+  - name: Associated physical Domain to EPG
+    cisco.aci.aci_epg_to_domain:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      ap: '{{ var_ap }}'
+      epg: '{{ var_epg1_PRE }}'
+      domain: '{{ var_domain }}'
+      domain_type: phys
+      state: present
+  - name: Associated physical Domain to EPG
+    cisco.aci.aci_epg_to_domain:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      ap: '{{ var_ap }}'
+      epg: '{{ var_epg2_PRE }}'
+      domain: '{{ var_domain }}'
+      domain_type: phys
+      state: present
+  - name: Deploy Static Path binding for given EPG
+    cisco.aci.aci_static_binding_to_epg:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      ap: '{{ var_ap }}'
+      epg: '{{ var_epg1_PRO }}'
+      encap_id: '{{var_encap_id_pro1}}'
+      deploy_immediacy: lazy
+      interface_mode: untagged
+      interface_type: switch_port
+      pod_id: 1
+      leafs: 101
+      interface: '1/7'
+      state: present
+  

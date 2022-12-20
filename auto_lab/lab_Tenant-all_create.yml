@@ -1,0 +1,117 @@
+---
+- hosts: aci
+  gather_facts: False
+  connection: local
+  tasks:
+  - name: Create new Tenant
+    cisco.aci.aci_tenant:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: auto_lab_Tenant
+      description: 
+      state: present
+  - name: Create new VRFs1
+    cisco.aci.aci_vrf:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      vrf: '{{ item }}'
+      tenant: auto_lab_Tenant
+      descr: Lab VRF
+      policy_control_preference: enforced
+      policy_control_direction: ingress
+      state: present
+    with_sequence: start=1 end=4 format=VRF%02d
+  - name: Create BDs
+    cisco.aci.aci_bd:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: auto_lab_Tenant
+      bd: '{{ item }}'
+      vrf: VRF01
+      state: present
+    with_sequence: start=1 end=10 format=BD%02d
+  - name: Create new VLAN-POOL
+    cisco.aci.aci_vlan_pool:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      pool: LAB_VLAN_POOL
+      pool_allocation_mode: static
+      state: present
+  - name: ADD new VLANs encapsulation Block
+    cisco.aci.aci_vlan_pool_encap_block:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      pool: LAB_VLAN_POOL
+      pool_allocation_mode: static
+      block_start: '1000'
+      block_end: '1100'
+      state: present
+  - name: Create PHY DOMAIN
+    cisco.aci.aci_domain:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      domain: phys_LAB_AUTO
+      domain_type: phys
+      state: present
+  - name: Associate PHY-DOMAIN to VLAN POOL
+    cisco.aci.aci_domain_to_encap_pool:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      domain: phys_LAB_AUTO
+      domain_type: phys
+      pool: LAB_VLAN_POOL
+      pool_type: vlan
+      pool_allocation_mode: static
+      state: present
+  - name: Create AP
+    cisco.aci.aci_ap:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: auto_lab_Tenant
+      ap: INTRANET
+      description: INTRANET LAB AP
+      monitoring_policy: default
+      state: present
+  - name: Create EPGs
+    cisco.aci.aci_epg:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: auto_lab_Tenant
+      ap: INTRANET
+      epg: '{{ item }}'
+      description: Web Intranet EPG
+      bd: prod_bd
+      monitoring_policy: default
+      preferred_group: yes
+      state: present
+    with_sequence: start=1 end=10 format=EPG%02d
+  - name: Associated physical Domain to EPG
+    cisco.aci.aci_epg_to_domain:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: auto_lab_Tenant
+      ap: INTRANET
+      epg: EPG01
+      domain: phys_LAB_AUTO
+      domain_type: phys
+      state: present

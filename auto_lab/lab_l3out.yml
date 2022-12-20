@@ -19,7 +19,26 @@
       prompt: "Enter l3out vrf"
     - name: var_l3out_protocol #variable
       private: no
-      prompt: "Enter l3out protocol"
+      prompt: "Enter l3out Routing protocol"
+    - name: var_l3out_node_profile #variable
+      private: no
+      prompt: "Enter Node Profile"
+    - name: var_l3out_interface_profile #variable
+      private: no
+      prompt: "Enter Interface Profile 1"
+    - name: var_l3out_pod_id #variable
+      private: no
+      prompt: "Enter pod id"
+    - name: var_l3out_node_id #variable
+      private: no
+      prompt: "Enter node id"
+    - name: var_l3out_path_ep #variable
+      private: no
+      prompt: "Enter physical interface"
+    - name: var_l3out_ipaddress #variable
+      private: no
+      prompt: "Enter svi ip address"
+
   tasks:
   - name: Create new Tenant
     cisco.aci.aci_tenant:
@@ -63,34 +82,12 @@
       password: '{{ apic_password }}'
       tenant: '{{ var_tenant }}'
       validate_certs: no
-      l3out: my_l3out
-      node_profile: my_node_profile
-      interface_profile: my_interface_profile
-      pod_id: 1
-      node_id: 201
-      path_ep: eth1/12
-      interface_type: l3-port
-      address: 192.168.10.1/27
-      state: present
-  - name: Add a new BGP peer on a physical interface
-    cisco.aci.aci_l3out_bgp_peer:
-      host: '{{ apic }}'
-      username: '{{ apic_user }}'
-      password: '{{ apic_password }}'
-      tenant: '{{ var_tenant }}'
-      validate_certs: no
       l3out: '{{ var_l3out_name }}'
-      node_profile: my_node_profile
-      interface_profile: my_interface_profile
-      pod_id: 1
-      node_id: 201
-      path_ep: eth1/12
-      peer_ip: 192.168.10.2
-      remote_asn: 65456
-      bgp_controls:
-        - nh-self
-        - send-com
-        - send-ext-com
-      peer_controls:
-        - bfd
+      node_profile: '{{ var_l3out_node_profile }}'
+      interface_profile: '{{ var_l3out_interface_profile }}'
+      pod_id: '{{ var_l3out_pod_id }}'
+      node_id: '{{ var_l3out_node_id }}'
+      path_ep: "eth1/12"
+      interface_type: l3-port
+      address: '{{ var_l3out_ipaddress }}'
       state: present

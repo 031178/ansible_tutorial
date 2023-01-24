@@ -7,4 +7,10 @@ all:
       vars:
         apic_user: 'admin'
         apic_password: '!v3G@!4@Y'
-   
+    paloalto:
+      hosts:
+        fw1: 172.16.100.158
+        fw2: 172.16.100.157  
+      vars:
+        paloalto_user: 'admin'
+        paloalto_password: 'admin'

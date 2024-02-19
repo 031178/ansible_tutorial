@@ -4,8 +4,8 @@
   tasks:
   - name: search for shared address object
     panos_object:
-    ip_address: '{{ fw2 }}'
-    username: '{{ paloalto_user }}'
-    password: '{{ paloalto_password }}'
-    operation: 'find'
-    address: 'DevNet'
+      ip_address: '{{ fw2 }}'
+      username: '{{ paloalto_user }}'
+      password: '{{ paloalto_password }}'
+      operation: 'find'
+      address: 'DevNet'

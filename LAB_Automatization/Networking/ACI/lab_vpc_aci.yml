@@ -26,4 +26,18 @@
       stp_interface_policy: STP_ON
       state: present
       aep: AAEP-1
-  
+  - name: Create and Bind Access Port Selector with VPC Policy Group
+    cisco.aci.aci_access_port_to_interface_policy_leaf_profile:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      interface_profile: leafsol
+      access_port_selector: accessportselectorname
+      policy_group: '{{ var_vpc }}'
+      access_port_selector_name: anstest_vpc_accessportselector
+      interface_type: vpc
+      port_blk: leafportblkname
+      from_port: 13
+      to_port: 13
+      state: present

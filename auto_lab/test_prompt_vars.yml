@@ -48,6 +48,9 @@
     - name: var_encap_id_pro1 #variable
       private: no
       prompt: "vlan id" 
+    - name: var_l3out #variable
+      private: no
+      prompt: "Enter Prod L3out" 
 
   tasks:
   - name: Create new Tenant
@@ -296,4 +299,17 @@
       leafs: 101
       interface: '1/7'
       state: present
-  
+  - name: Add a new L3Out
+    cisco.aci.aci_l3out:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      name: '{{ var_l3out }}'
+      description: L3Out for Production tenant
+      domain: '{{ var_domain }}'
+      vrf: '{{ var_vrf1 }}'
+      l3protocol: static
+      state: present
+ 

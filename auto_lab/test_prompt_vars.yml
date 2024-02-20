@@ -304,7 +304,6 @@
       host: '{{ apic }}'
       username: '{{ apic_user }}'
       password: '{{ apic_password }}'
-      validate_certs: no
       tenant: '{{ var_tenant }}'
       name: '{{ var_l3out }}'
       description: L3Out for Production tenant

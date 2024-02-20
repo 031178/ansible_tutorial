@@ -1,0 +1,151 @@
+---
+- hosts: aci
+  gather_facts: False
+  connection: local
+  vars_prompt:
+    - name: var_tenant #variable
+      private: no
+      prompt: "Enter Tenant name"
+    - name: var_domain #variable
+      private: no
+      prompt: "Enter Physical Domain"
+    - name: var_vrf1 #variable
+      private: no
+      prompt: "Enter VRF1 name"
+    - name: var_l3out #variable
+      private: no
+      prompt: "Enter Prod L3out" 
+    - name: var_node_profile #variable
+      private: no
+      prompt: "Enter LNP Name" 
+    - name: var_interface_profile #variable
+      private: no
+      prompt: "Enter Interface Profile Name" 
+      
+  tasks:
+  - name: Create new Tenant
+    cisco.aci.aci_tenant:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      description: 
+      state: present
+  - name: Create PHY DOMAIN
+    cisco.aci.aci_domain:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      domain: '{{ var_domain }}'
+      domain_type: phys
+      state: present
+  - name: Create new VRFs1
+    cisco.aci.aci_vrf:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      vrf: '{{ var_vrf1 }}'
+      tenant: '{{ var_tenant }}'
+      descr: Lab VRF
+      policy_control_preference: enforced
+      policy_control_direction: ingress
+      state: present
+  - name: Add a new L3Out
+    cisco.aci.aci_l3out:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      route_control: export
+      name: '{{ var_l3out }}'
+      description: L3Out for Production tenant
+      domain: '{{ var_domain }}'
+      vrf: '{{ var_vrf1 }}'
+      l3protocol: static
+      state: present
+  - name: Add a new node profile
+    cisco.aci.aci_l3out_logical_node_profile:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      node_profile: '{{ var_node_profile }}'
+      description: node profile for my_l3out
+      l3out: '{{ var_l3out }}'
+      tenant: '{{ var_tenant }}'
+      dscp: CS0
+      state: present
+  - name: Deploy Logical Node_TO_CORE1 
+    cisco.aci.aci_l3out_logical_node:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      l3out: '{{ var_l3out }}'
+      node_profile: '{{ var_node_profile }}'
+      pod_id: 1
+      node_id: 111
+      router_id: 111.111.111.111
+      state: present
+  - name: Deploy Logical Nodes_TO_CORE2
+    cisco.aci.aci_l3out_logical_node:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      l3out: '{{ var_l3out }}'
+      node_profile: '{{ var_node_profile }}'
+      pod_id: 1
+      node_id: 112
+      router_id: 111.111.111.112
+      state: present
+  - name: Deploy Logical Nodes_TO_CORE3
+    cisco.aci.aci_l3out_logical_node:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      l3out: '{{ var_l3out }}'
+      node_profile: '{{ var_node_profile }}'
+      pod_id: 2
+      node_id: 211
+      router_id: 211.111.111.111
+      state: present
+  - name: Deploy Logical Nodes_TO_CORE4
+    cisco.aci.aci_l3out_logical_node:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      l3out: '{{ var_l3out }}'
+      node_profile: '{{ var_node_profile }}'
+      pod_id: 2
+      node_id: 212
+      router_id: 211.111.111.112
+      state: present
+  - name: Add a new SVI vPC
+    cisco.aci.aci_l3out_interface:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: '{{ var_tenant }}'
+      l3out: '{{ var_l3out }}'
+      node_profile: '{{ var_node_profile }}'
+      interface_profile: '{{ var_interface_profile }}'
+      pod_id: 1
+      node_id: 111-112
+      path_ep: testsol
+      interface_type: ext-svi
+      encap: vlan-800
+      mode: regular
+      state: present
+

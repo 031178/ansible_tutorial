@@ -2,6 +2,11 @@
 - hosts: aci
   gather_facts: False
   connection: local
+  vars_prompt:
+    - name: var_vpc #variable
+      private: no
+      prompt: "Enter vpc name"
+
   tasks:
   - name: Create a Port Channel (PC) Interface Policy Group
     cisco.aci.aci_interface_policy_leaf_policy_group:
@@ -10,12 +15,15 @@
       password: '{{ apic_password }}'
       validate_certs: no
       lag_type: node
-      policy_group: '{{ item }}'
+      policy_group: '{{ var_vpc }}'
       description: vPC_LAB_Creation
       link_level_policy: 10G_Auto
       cdp_policy: CDP_Enabled
       lldp_policy: LLDP_Enabled
+      mcp_policy: MCP_DISABLE
       port_channel_policy: LACP_Enabled
+      storm_control_interface_policy: STORM_ON
+      stp_interface_policy: STP_ON
       state: present
       aep: AAEP-1
-    with_sequence: start=1 end=5 format=Server%02d
+  

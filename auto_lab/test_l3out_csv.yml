@@ -1,0 +1,20 @@
+---
+- hosts: aci
+  gather_facts: False
+  connection: local
+- name: Define Values From CSV File, this reads file in one go, but you could also use col= to read each in it's own lookup.
+  ansible.builtin.set_fact:
+    name: "{{ csvline[0] }}"
+    tenant: "{{ csvline[1] }}"
+    vrf: "{{ csvline[2] }}"
+    enable_bgp: "{{ csvline[3] }}"
+    enable_ospf: "{{ csvline[4] }}"
+    ospf_area_id: "{{ csvline[5] }}"
+    area_type: "{{ csvline[6] }}"
+    l3out_domain: "{{ csvline[7] }}"
+    status: "{{ csvline[8] }}"
+  vars:
+    csvline: "{{ lookup('ansible.builtin.csvfile', bgp_neighbor_ip, file='bgp_neighbors.csv', delimiter=',') }}"
+        
+  tasks:
+  

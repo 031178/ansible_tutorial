@@ -12,7 +12,9 @@
     - name: var_interface_profile #variable
       private: no
       prompt: "Enter Interface Profile Name" 
-
+    - name: var_ext_epg #variable
+      private: no
+      prompt: "EXT-EPG1" 
       
   tasks:
   - name: Create new Tenant
@@ -292,5 +294,81 @@
       prefix: 10.231.122.0/25
       nexthop: 10.224.80.14
       state: present
+  - name: Create static routes
+    cisco.aci.aci_l3out_static_routes:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: PRE
+      l3out: '{{ var_l3out }}'
+      node_profile: '{{ var_node_profile }}'
+      node_id: 2101
+      pod_id: 2
+      prefix: 10.231.122.0/25
+  - name: Add a new nexthop to a prefix
+    cisco.aci.aci_l3out_static_routes_nexthop:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: PRE
+      l3out: '{{ var_l3out }}'
+      node_profile: '{{ var_node_profile }}'
+      pod_id: 2
+      node_id: 2101
+      prefix: 10.231.122.0/25
+      nexthop: 10.224.80.14
+      state: present
+  - name: Create static routes
+    cisco.aci.aci_l3out_static_routes:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: PRE
+      l3out: '{{ var_l3out }}'
+      node_profile: '{{ var_node_profile }}'
+      node_id: 2102
+      pod_id: 2
+      prefix: 10.231.122.0/25
+  - name: Add a new nexthop to a prefix
+    cisco.aci.aci_l3out_static_routes_nexthop:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: PRE
+      l3out: '{{ var_l3out }}'
+      node_profile: '{{ var_node_profile }}'
+      pod_id: 2
+      node_id: 2102
+      prefix: 10.231.122.0/25
+      nexthop: 10.224.80.14
+      state: present
 
-
+  - name: Add a new ExtEpg
+    cisco.aci.aci_l3out_extepg:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: PRE
+      l3out: '{{ var_l3out }}'
+      name: '{{ var_ext_epg }}'
+      description: ExtEpg for Production L3Out
+      state: present
+  - name: Add a new External Subnet
+    cisco.aci.aci_l3out_extsubnet:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: PRE
+      l3out: '{{ var_l3out }}'
+      extepg: '{{ var_ext_epg }}'
+      description: External Subnet for Production ExtEpg
+      network: 0.0.0.0/0
+      scope: export-rtctrl
+      aggregate: export-rtctrl
+      state: present

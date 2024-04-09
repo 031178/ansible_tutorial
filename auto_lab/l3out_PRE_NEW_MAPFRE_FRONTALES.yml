@@ -44,7 +44,7 @@
       username: '{{ apic_user }}'
       password: '{{ apic_password }}'
       validate_certs: no
-      vrf: VRF_PRE_VERTI_FRONTALES
+      vrf: VRF_PRE_MAPFRE_FRONTALES
       tenant: PRE
       descr: Lab VRF
       policy_control_preference: enforced
@@ -61,7 +61,7 @@
       name: '{{ var_l3out }}'
       description: L3Out for Production tenant
       domain: L3DOM_INFRA
-      vrf: VRF_PRE_VERTI_FRONTALES
+      vrf: VRF_PRE_MAPFRE_FRONTALES
       l3protocol: static
       state: present
   - name: Add a new node profile
@@ -98,7 +98,7 @@
       node_profile: '{{ var_node_profile }}'
       pod_id: 1
       node_id: 1101
-      router_id: 10.224.64.85
+      router_id: 10.224.64.79
       state: present
   - name: Deploy Logical Nodes_TO_CORE2
     cisco.aci.aci_l3out_logical_node:
@@ -111,7 +111,7 @@
       node_profile: '{{ var_node_profile }}'
       pod_id: 1
       node_id: 1102
-      router_id: 10.224.64.86
+      router_id: 10.224.64.80
       state: present
   - name: Deploy Logical Nodes_TO_CORE3
     cisco.aci.aci_l3out_logical_node:
@@ -124,7 +124,7 @@
       node_profile: '{{ var_node_profile }}'
       pod_id: 2
       node_id: 2101
-      router_id: 10.225.64.85
+      router_id: 10.225.64.79
       state: present
   - name: Deploy Logical Nodes_TO_CORE4
     cisco.aci.aci_l3out_logical_node:
@@ -137,7 +137,7 @@
       node_profile: '{{ var_node_profile }}'
       pod_id: 2
       node_id: 2102
-      router_id: 10.225.64.86
+      router_id: 10.225.64.80
       state: present
   - name: Add a new SVI vPC
     cisco.aci.aci_l3out_interface:
@@ -153,7 +153,7 @@
       node_id: 1101-1102
       path_ep: vPC_TO_NEW_F5_INTERNAL_PRE_NODO1
       interface_type: ext-svi
-      encap: vlan-432
+      encap: vlan-434
       mode: regular
       state: present
   - name: Add a new SVI vPC
@@ -170,7 +170,7 @@
       node_id: 2101-2102
       path_ep: vPC_TO_NEW_F5_INTERNAL_PRE_NODO2
       interface_type: ext-svi
-      encap: vlan-432
+      encap: vlan-434
       mode: regular
       state: present    
   - name: Create a VPC member based pod, node and path
@@ -187,9 +187,23 @@
       node_id: 1101-1102
       path_ep: vPC_TO_NEW_F5_INTERNAL_PRE_NODO1
       side: A
-      address: 10.224.80.2/28
+      address: 10.224.80.34/28
+      state: present
+  - name: Create a VPC member based pod, node and path
+    cisco.aci.aci_l3out_logical_interface_vpc_member:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: PRE
+      l3out: '{{ var_l3out }}'
+      node_profile: '{{ var_node_profile }}'
+      interface_profile: '{{ var_interface_profile }}'
+      pod_id: 1
+      node_id: 1101-1102
+      path_ep: vPC_TO_NEW_F5_INTERNAL_PRE_NODO1
       side: B
-      address: 10.224.80.3/28
+      address: 10.224.80.35/28
       state: present
   - name: Add a new secondary IP to a vPC member
     cisco.aci.aci_l3out_interface_secondary_ip:
@@ -205,9 +219,9 @@
       node_id: 1101-1102
       path_ep: vPC_TO_NEW_F5_INTERNAL_PRE_NODO1
       side: A
-      address: 10.224.80.1/28
+      address: 10.224.80.33/28
       side: B
-      address: 10.224.80.1/28
+      address: 10.224.80.33/28
       state: present
   - name: Create a VPC member based pod, node and path
     cisco.aci.aci_l3out_logical_interface_vpc_member:
@@ -223,9 +237,23 @@
       node_id: 2101-2102
       path_ep: vPC_TO_NEW_F5_INTERNAL_PRE_NODO2
       side: A
-      address: 10.224.80.4/28
+      address: 10.224.80.36/28
+      state: present
+  - name: Create a VPC member based pod, node and path
+    cisco.aci.aci_l3out_logical_interface_vpc_member:
+      host: '{{ apic }}'
+      username: '{{ apic_user }}'
+      password: '{{ apic_password }}'
+      validate_certs: no
+      tenant: PRE
+      l3out: '{{ var_l3out }}'
+      node_profile: '{{ var_node_profile }}'
+      interface_profile: '{{ var_interface_profile }}'
+      pod_id: 2
+      node_id: 2101-2102
+      path_ep: vPC_TO_NEW_F5_INTERNAL_PRE_NODO2
       side: B
-      address: 10.224.80.5/28
+      address: 10.224.80.37/28
       state: present
   - name: Add a new secondary IP to a vPC member
     cisco.aci.aci_l3out_interface_secondary_ip:
@@ -241,9 +269,9 @@
       node_id: 2101-2102
       path_ep: vPC_TO_NEW_F5_INTERNAL_PRE_NODO2
       side: A
-      address: 10.224.80.1/28
+      address: 10.224.80.33/28
       side: B
-      address: 10.224.80.1/28
+      address: 10.224.80.33/28
       state: present
   - name: Create static routes
     cisco.aci.aci_l3out_static_routes:
@@ -256,7 +284,7 @@
       node_profile: '{{ var_node_profile }}'
       node_id: 1101
       pod_id: 1
-      prefix: 10.231.122.0/25
+      prefix: 10.231.113.0/24
   - name: Add a new nexthop to a prefix
     cisco.aci.aci_l3out_static_routes_nexthop:
       host: '{{ apic }}'
@@ -268,8 +296,8 @@
       node_profile: '{{ var_node_profile }}'
       pod_id: 1
       node_id: 1101
-      prefix: 10.231.122.0/25
-      nexthop: 10.224.80.14
+      prefix: 10.231.113.0/24
+      nexthop: 10.224.80.46
       state: present
   - name: Create static routes
     cisco.aci.aci_l3out_static_routes:
@@ -282,7 +310,7 @@
       node_profile: '{{ var_node_profile }}'
       node_id: 1102
       pod_id: 1
-      prefix: 10.231.122.0/25
+      prefix: 10.231.113.0/24
   - name: Add a new nexthop to a prefix
     cisco.aci.aci_l3out_static_routes_nexthop:
       host: '{{ apic }}'
@@ -294,8 +322,8 @@
       node_profile: '{{ var_node_profile }}'
       pod_id: 1
       node_id: 1102
-      prefix: 10.231.122.0/25
-      nexthop: 10.224.80.14
+      prefix: 10.231.113.0/24
+      nexthop: 10.224.80.46
       state: present
   - name: Create static routes
     cisco.aci.aci_l3out_static_routes:
@@ -308,7 +336,7 @@
       node_profile: '{{ var_node_profile }}'
       node_id: 2101
       pod_id: 2
-      prefix: 10.231.122.0/25
+      prefix: 10.231.113.0/24
   - name: Add a new nexthop to a prefix
     cisco.aci.aci_l3out_static_routes_nexthop:
       host: '{{ apic }}'
@@ -320,8 +348,8 @@
       node_profile: '{{ var_node_profile }}'
       pod_id: 2
       node_id: 2101
-      prefix: 10.231.122.0/25
-      nexthop: 10.224.80.14
+      prefix: 10.231.113.0/24
+      nexthop: 10.224.80.46
       state: present
   - name: Create static routes
     cisco.aci.aci_l3out_static_routes:
@@ -334,7 +362,7 @@
       node_profile: '{{ var_node_profile }}'
       node_id: 2102
       pod_id: 2
-      prefix: 10.231.122.0/25
+      prefix: 10.231.113.0/24
   - name: Add a new nexthop to a prefix
     cisco.aci.aci_l3out_static_routes_nexthop:
       host: '{{ apic }}'
@@ -346,8 +374,8 @@
       node_profile: '{{ var_node_profile }}'
       pod_id: 2
       node_id: 2102
-      prefix: 10.231.122.0/25
-      nexthop: 10.224.80.14
+      prefix: 10.231.113.0/24
+      nexthop: 10.224.80.46
       state: present
   - name: Add a new ExtEpg
     cisco.aci.aci_l3out_extepg:
@@ -383,7 +411,7 @@
       tenant: PRE
       l3out: '{{ var_l3out }}'
       extepg : '{{ var_ext_epg1 }}'
-      contract: CTRT_PRE_F5_VERTI_FRONTALES
+      contract: CTRT_PRE_F5-MAPFRE_FRONTALES
       contract_type: provider
       state: present
   - name: Bind a contract to an external EPG
@@ -395,7 +423,7 @@
       tenant: PRE
       l3out: '{{ var_l3out }}'
       extepg : '{{ var_ext_epg1 }}'
-      contract: CTRT_PRE_TRANSITO_VERTI_FRONTALES
+      contract: CTRT_PRE_TRANSITO_MAPFRE_FRONTALES
       contract_type: consumer
       state: present    
   - name: Add a new ExtEpg
@@ -432,6 +460,6 @@
       tenant: PRE
       l3out: '{{ var_l3out }}'
       extepg : '{{ var_ext_epg2 }}'
-      contract: CTRT_PRE_F5_VERTI_FRONTALES_VIP
+      contract: CTRT_PRE_F5_MAPFRE-FRONTALES_VIP
       contract_type: provider
       state: present  

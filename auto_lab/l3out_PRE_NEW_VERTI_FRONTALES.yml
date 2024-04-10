@@ -399,8 +399,6 @@
       extepg: '{{ var_ext_epg1 }}'
       description: External Subnet for Production ExtEpg
       network: 0.0.0.0/0
-      scope: export-rtctrl
-      aggregate: export-rtctrl
       state: present
   - name: Bind a contract to an external EPG
     cisco.aci.aci_l3out_extepg_to_contract:
